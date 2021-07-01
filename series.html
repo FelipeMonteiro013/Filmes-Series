@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="br" dir="ltr">
+
+<head>
+  <meta charset="utf-8">
+  <title>Filminho</title>
+  <link rel="stylesheet" href="css/style.css" type="text/css">
+  <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+</head>
+
+<body>
+  <div class="main">
+    <header>
+      Bem vindo!
+    </header>
+    <menu>
+      <a href="index.html">
+        <div class="botao">
+          Filmes
+        </div>
+      </a>
+      <a href="series.html">
+        <div class="botao">
+          Séries
+        </div>
+      </a>
+    </menu>
+    <div class="content">
+
+
+    </div>
+    <div class="paginacao">
+      <div id="preview" class="circle">
+        < </div>
+          <div id="number" class="pagNumber">
+
+          </div>
+          <div id="next" class="circle">
+            >
+          </div>
+      </div>
+    </div>
+    <script type="text/javascript">
+
+      let pag = 1
+
+      function nextPage() {
+        const filmes = document.querySelectorAll('.filme')
+
+        for (let index = 0; index < filmes.length; index++) {
+          filmes[index].remove();
+        }
+
+        pag = pag + 1;
+
+        window.scroll({
+          top: 0,
+          left: 0,
+          behavior: 'auto'
+        });
+        getSeries(pag)
+      }
+
+      function prevPage() {
+        if (pag > 1) {
+          const filmes = document.querySelectorAll('.filme');
+
+          for (let index = 0; index < filmes.length; index++) {
+            filmes[index].remove();
+          }
+
+          pag = pag - 1;
+
+          window.scroll({
+            top: 0,
+            left: 0,
+            behavior: 'auto'
+          });
+
+          getSeries(pag)
+        }
+      }
+
+      async function getSeries(num) {
+        
+        let response = await axios.get(`https://api-movies-series.herokuapp.com/series?page=${num}`)
+        const series = response.data.results;
+        const elemento = document.querySelector('div .content');
+        var pagina = response.data.page;
+
+        const textPage = document.getElementById('number');
+        const page = document.createTextNode(pag)
+        if (page != '1') {
+          textPage.innerHTML = pag
+        }
+
+        series.map((serie) => {
+
+          // Criando a div de series
+          const link = document.createElement('a');
+          const boxSerie = document.createElement('div');
+          const img = document.createElement('img');
+          const imagem = document.createElement('div')
+          const title = document.createElement('div');
+          const description = document.createElement('div');
+          const id = serie.id;
+
+          // adicionando as classes nos elementos
+          boxSerie.classList.add('filme');
+          img.classList.add('imagem');
+          title.classList.add('titulo');
+          description.classList.add('descricao');
+
+          // Puxando dados da API
+          img.src = serie.backdrop_path;
+          title.append(serie.original_name);
+          description.append(serie.overview);
+
+          // colocando os dados da API nas divs
+          imagem.appendChild(img);
+          boxSerie.appendChild(imagem);
+          boxSerie.appendChild(title);
+          boxSerie.appendChild(description);
+          elemento.appendChild(boxSerie);
+
+        });
+
+        const next = document.getElementById('next');
+        next.addEventListener('click', nextPage)
+
+        const preview = document.getElementById('preview');
+        preview.addEventListener('click', prevPage)
+
+
+
+
+
+      }
+
+
+
+      getSeries();
+
+    </script>
+</body>
+
+</html>
